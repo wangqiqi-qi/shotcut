@@ -42,60 +42,108 @@
 #include <QtXml>
 
 // formulas to map absolute value ranges to percentages as int
+// 用于将绝对值范围映射到百分比（整数）的公式宏定义
 #define TO_ABSOLUTE(min, max, rel) qRound(float(min) + float((max) - (min)) * float(rel) / 100.0f)
+// 将相对百分比值转换为绝对值的宏
+// 参数：min - 最小值，max - 最大值，rel - 百分比值（0-100）
+// 公式：abs = min + (max-min) * rel/100
+// qRound: Qt的四舍五入函数
+
 #define TO_RELATIVE(min, max, abs) qRound(100.0f * float((abs) - (min)) / float((max) - (min)))
+// 将绝对值转换为相对百分比的宏
+// 参数：min - 最小值，max - 最大值，abs - 绝对值
+// 公式：rel = 100 * (abs-min)/(max-min)
+// qRound: Qt的四舍五入函数
+
 static const int kOpenCaptureFileDelayMs = 1500;
+// 静态常量：打开捕获文件的延迟时间（毫秒）
+// 1500ms = 1.5秒，可能用于防止文件系统就绪前的过早访问
+
 static const int kCustomPresetFileNameRole = Qt::UserRole + 1;
+// 静态常量：自定义预设文件名角色
+// Qt::UserRole 是Qt自定义数据的起始角色，+1表示第一个自定义数据角色
+// 用于在Qt项模型（如QStandardItemModel）中存储预设文件名
+
 #ifdef Q_OS_WIN
 static const QString kNullTarget = "nul";
+// 如果是在Windows操作系统上
+// 定义空目标设备为"nul"（Windows的空设备，类似于/dev/null）
 #else
 static const QString kNullTarget = "/dev/null";
+// 其他操作系统（如Linux、macOS）
+// 定义空目标设备为"/dev/null"（Unix-like系统的空设备）
 #endif
+// 这个常量用于指定输出到空设备（丢弃输出），常用于测试或分析阶段
 
 static double getBufferSize(Mlt::Properties &preset, const char *property);
+// 静态函数声明：获取缓冲区大小
+// 参数：preset - MLT属性引用，property - 属性名称字符串指针
+// 返回：double类型的缓冲区大小值
+// 此函数从预设属性中获取指定属性的缓冲区大小值
 
+// 静态函数：获取重帧（reframe）过滤器
 static Mlt::Filter getReframeFilter(Mlt::Service *service)
 {
+    // 检查传入的服务指针是否有效且为有效服务
     if (service && service->is_valid())
+        // 遍历服务上的所有过滤器
         for (auto i = 0; i < service->filter_count(); ++i) {
+            // 使用智能指针获取第i个过滤器，防止内存泄漏
             std::unique_ptr<Mlt::Filter> filter(service->filter(i));
+            
+            // 检查过滤器是否有效且为"reframe"类型
             if (filter && filter->is_valid()
                 && !::qstrcmp("reframe", filter->get(kShotcutFilterProperty)))
+                // 找到重帧过滤器，返回其副本（通过获取底层过滤器指针创建新对象）
                 return Mlt::Filter(filter->get_filter());
         }
+    
+    // 如果没有找到重帧过滤器，返回一个空的过滤器对象
     return Mlt::Filter();
 }
 
-EncodeDock::EncodeDock(QWidget *parent)
-    : QDockWidget(parent)
-    , ui(new Ui::EncodeDock)
-    , m_presets(Mlt::Repository::presets())
-    , m_immediateJob(0)
-    , m_profiles(Mlt::Profile::list())
-    , m_isDefaultSettings(true)
-    , m_fps(0.0)
+// EncodeDock 类的构造函数
+EncodeDock::EncodeDock(QWidget *parent)  // 参数：父部件指针
+    : QDockWidget(parent)                // 调用基类 QDockWidget 构造函数
+    , ui(new Ui::EncodeDock)             // 初始化 UI 对象（动态分配）
+    , m_presets(Mlt::Repository::presets())  // 从 MLT 仓库获取预设列表
+    , m_immediateJob(0)                  // 立即任务指针初始化为空
+    , m_profiles(Mlt::Profile::list())   // 从 MLT 获取配置文件列表
+    , m_isDefaultSettings(true)          // 标记为默认设置（初始状态）
+    , m_fps(0.0)                         // 帧率初始化为 0.0
 {
-    LOG_DEBUG() << "begin";
-    initSpecialCodecLists();
-    ui->setupUi(this);
+    LOG_DEBUG() << "begin";  // 输出调试日志，标记构造函数开始
+    initSpecialCodecLists();             // 初始化特殊编码器列表（如无损编码器等）
+    ui->setupUi(this);                   // 设置 UI（初始化界面布局和组件）
+    
+    // 设置重新采样警告标签的颜色以突出显示
     Util::setColorsToHighlight(ui->resampleWarningLabel);
-    hideResampleWarning(true);
-    // TODO: Reframe does not work--even affine filter
+    hideResampleWarning(true);           // 初始隐藏重新采样警告
+    
+    // TODO: 重帧功能不工作——即使使用 affine 过滤器
+    // 如果设置中启用了 GPU 加速播放器
     if (Settings.playerGPU()) {
-        ui->reframeLabel->hide();
-        ui->reframeButton->hide();
-        delete ui->horizontalLayout_22;
+        ui->reframeLabel->hide();       // 隐藏重帧标签
+        ui->reframeButton->hide();      // 隐藏重帧按钮
+        delete ui->horizontalLayout_22; // 删除相关布局（清理界面元素）
     }
-    ui->stopCaptureButton->hide();
+    
+    ui->stopCaptureButton->hide();      // 初始隐藏停止捕获按钮
+    
+    // 从设置中获取编码高级选项状态并应用到界面
     ui->advancedButton->setChecked(Settings.encodeAdvanced());
     ui->advancedCheckBox->setChecked(Settings.encodeAdvanced());
+    // 触发高级按钮点击事件以同步界面状态
     on_advancedButton_clicked(ui->advancedButton->isChecked());
-#if QT_POINTER_SIZE == 4
-    // On 32-bit process, limit multi-threading to mitigate running out of memory.
-    ui->parallelCheckbox->setChecked(false);
-    ui->parallelCheckbox->setHidden(true);
-#else
+    
+#if QT_POINTER_SIZE == 4  // 如果是 32 位系统（指针大小为 4 字节）
+    // 在 32 位进程中，限制多线程以避免内存耗尽
+    ui->parallelCheckbox->setChecked(false);  // 禁用并行处理复选框
+    ui->parallelCheckbox->setHidden(true);    // 隐藏并行处理复选框
+#else  // 64 位系统
+    // 从设置中获取并行处理状态
     ui->parallelCheckbox->setChecked(Settings.encodeParallelProcessing());
+    // 设置视频编码器线程数微调框的最大值为系统理想线程数
     ui->videoCodecThreadsSpinner->setMaximum(QThread::idealThreadCount());
 #endif
     if (QThread::idealThreadCount() < 3)
