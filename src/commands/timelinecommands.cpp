@@ -1829,3 +1829,4 @@ ApplyFiltersCommand::ApplyFiltersCommand(MultitrackModel &model,
 {
     setText(QObject::tr("Apply copied filters"));
 }
+}

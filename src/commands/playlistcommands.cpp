@@ -634,5 +634,5 @@ void RenameBinCommand::undo()
     emit m_binTree->itemSelectionChanged();
 }
 
-/**
- * @brief 静态辅助函数，用于根据
+
+}
