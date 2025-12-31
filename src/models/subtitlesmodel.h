@@ -1,3 +1,11 @@
+#ifndef SUBTITLESMODEL_H
+#define SUBTITLESMODEL_H
+
+#include <QAbstractTableModel>
+#include "subtitles.h"
+
+namespace Subtitles {
+
 /*
  * Copyright (c) 2024 Meltytech, LLC
  *
@@ -124,5 +132,8 @@ private:
     QTimer *m_commitTimer;
     int m_commitTrack;
 };
+
+#endif // SUBTITLESMODEL_H
+} // namespace Subtitles
 
 #endif // SUBTITLESMODEL_H

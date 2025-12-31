@@ -149,7 +149,6 @@ private:
     void setupSettingsMenu();
     void setupOpenOtherMenu();
     void setupActions();
-    void setupExportFrameAction();
     QAction *addProfile(QActionGroup *actionGroup, const QString &desc, const QString &name);
     QAction *addLayout(QActionGroup *actionGroup, const QString &name);
     void readPlayerSettings();
@@ -177,7 +176,6 @@ private:
     bool confirmProfileChange();
     bool confirmRestartExternalMonitor();
     void resetFilterMenuIfNeeded();
-    void setupExportFrameAction();
 
     Ui::MainWindow *ui;
     Player *m_player;

@@ -37,7 +37,6 @@
 #include <QQmlComponent>
 #include <QQmlEngine>
 #include <QTimerEvent>
-<<<<<<< HEAD extern MainWindow *MAIN; == == == =
 #include <QFileDialog>
 #include <QStandardPaths>
 
@@ -58,7 +57,6 @@
  * 4. 与撤销/重做系统集成，暂停和恢复滤镜的撤销跟踪。
  * 5. 处理滤镜的添加、移除和更新。
  */
->>>>>>> master
 
     FilterController::FilterController(QObject *parent)
     : QObject(parent)
@@ -394,7 +392,6 @@ void FilterController::setTrackTransitionService(const QString &service)
     }
 }
 
-<<<<<<< HEAD
 // 王奇琪
 
 void FilterController::exportCurrentFrame()
@@ -482,4 +479,3 @@ return result.convertToFormat(QImage::Format_ARGB32);
                                  QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
                                  "Images (*.png)");
 }
->>>>>>> master

@@ -28,7 +28,6 @@ ColorDialog::ColorDialog(QObject *parent)
     : QObject{parent}
 {}
 
-<<<<<<< HEAD
 // 【功能】：打开颜色选择对话框并处理用户选择
 // 【说明】：这是核心交互方法，弹出系统颜色选择器，获取用户选择的颜色
 void ColorDialog::open()
@@ -70,7 +69,6 @@ void ColorDialog::open()
             Settings.saveCustomColors();
 
             if (newColor.isValid() && showAlpha) {
->>>>>>> 99569656ee5a8cd97959b39f6f18bbcc6014139d
                 auto rgb = newColor;
                 auto transparent = QColor(0, 0, 0, 0); // 完全透明的黑色
 
@@ -83,7 +81,6 @@ void ColorDialog::open()
                     // 将透明度恢复为不透明，避免显示问题
                     newColor.setAlpha(255);
                 }
-<<<<<<< HEAD
 
                 // 更新选择的颜色并发出接受信号
                 == == == =
@@ -97,7 +94,6 @@ void ColorDialog::open()
             auto newColor = getColor(m_color, nullptr, m_title, m_showAlpha);
 
             if (newColor.isValid()) {
->>>>>>> 99569656ee5a8cd97959b39f6f18bbcc6014139d
                 setSelectedColor(newColor);
                 emit accepted(); // 通知QML界面用户已确认选择
             }
@@ -126,7 +122,6 @@ void ColorDialog::open()
             }
         }
 
-<<<<<<< HEAD
         == == == = void ColorDialog::setShowAlpha(bool show)
         {
             if (show != m_showAlpha) {
@@ -134,4 +129,3 @@ void ColorDialog::open()
                 emit showAlphaChanged();
             }
         }
->>>>>>> 99569656ee5a8cd97959b39f6f18bbcc6014139d

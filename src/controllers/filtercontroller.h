@@ -270,7 +270,6 @@ private slots:
     //王奇琪
 
 public slots:
-    void exportCurrentFrame();
 
 private:
     /**
@@ -290,6 +289,5 @@ private:
     MotionTrackerModel m_motionTrackerModel; ///< 运动跟踪模型实例。
     AttachedFiltersModel m_attachedModel;    ///< 附加滤镜模型实例。
     int m_currentFilterIndex;                ///< 当前选中滤镜在附加模型中的索引。
-    QImage getCurrentFrameAsImage(int position);
 };
 #endif // FILTERCONTROLLER_H

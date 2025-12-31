@@ -42,7 +42,6 @@
 ColorPickerItem::ColorPickerItem(QObject *parent)
     : QObject(parent)
 {
-<<<<<<< HEAD
 #ifdef Q_OS_LINUX
     // 【Linux平台】：注册QColor类型到DBus系统，用于进程间通信
     == == == =
@@ -63,7 +62,6 @@ ColorPickerItem::ColorPickerItem(QObject *parent)
 // 【说明】：根据平台和配置选择不同的颜色抓取方式
 void ColorPickerItem::screenSelected(const QRect &rect)
 {
-<<<<<<< HEAD
     m_selectedRect = rect; // 保存选择的区域
 #ifdef Q_OS_LINUX
     // 【Linux平台】：根据配置选择DBus方式或传统方式
